@@ -20,8 +20,19 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  linux-x86_64:
-    runs-on: ubuntu-24.04
+  build:
+    name: Linux ${{ matrix.arch }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - arch: x86_64
+            nvim_arch: x86_64
+            runner: ubuntu-24.04
+          - arch: aarch64
+            nvim_arch: arm64
+            runner: ubuntu-24.04-arm
+    runs-on: ${{ matrix.runner }}
     steps:
       - uses: actions/checkout@v5
         with:
@@ -41,7 +52,7 @@ jobs:
           path: |
             ~/.stack
             haskell/.stack-work
-          key: ${{ runner.os }}-stack-${{ hashFiles('haskell/stack.yaml', 'haskell/nvim-config-hs.cabal') }}
+          key: ${{ runner.os }}-${{ matrix.arch }}-stack-${{ hashFiles('haskell/stack.yaml', 'haskell/nvim-config-hs.cabal') }}
 
       - name: Build and test Haskell provider
         working-directory: haskell
@@ -58,10 +69,11 @@ jobs:
           payload="$RUNNER_TEMP/xxh-neovim"
           mkdir -p "$payload/bin" "$payload/config" "$payload/lib" "$payload/opt"
 
+          nvim_archive="nvim-linux-${{ matrix.nvim_arch }}.tar.gz"
           curl --fail --location --silent --show-error \
-            https://github.com/neovim/neovim/releases/download/stable/nvim-linux-x86_64.tar.gz \
+            "https://github.com/neovim/neovim/releases/download/stable/$nvim_archive" \
             | tar -xz -C "$payload/opt"
-          mv "$payload/opt/nvim-linux-x86_64" "$payload/opt/nvim"
+          mv "$payload/opt/nvim-linux-${{ matrix.nvim_arch }}" "$payload/opt/nvim"
 
           cp dist/provider/nvim-config-hs "$payload/bin/nvim-config-hs"
           ldd dist/provider/nvim-config-hs \
@@ -78,15 +90,34 @@ jobs:
           git -C "$payload/config/nvim" add .
           git -C "$payload/config/nvim" commit -m "xxh payload"
 
-          tar -czf xxh-neovim-linux-x86_64.tar.gz -C "$payload" .
+          tar -czf "xxh-neovim-linux-${{ matrix.arch }}.tar.gz" -C "$payload" .
+
+      - name: Upload payload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: xxh-neovim-linux-${{ matrix.arch }}
+          path: xxh-neovim-linux-${{ matrix.arch }}.tar.gz
+          if-no-files-found: error
+
+  publish:
+    needs: build
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Download payload artifacts
+        uses: actions/download-artifact@v5
+        with:
+          pattern: xxh-neovim-linux-*
+          path: dist
+          merge-multiple: true
 
       - name: Publish rolling release
         env:
           GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
         run: |
           if ! gh release view xxh-latest >/dev/null 2>&1; then
             gh release create xxh-latest \
               --title "xxh Neovim" \
-              --notes "Rolling Linux x86_64 build for the xxh prerun plugin."
+              --notes "Rolling Linux x86_64 and aarch64 builds for the xxh prerun plugin."
           fi
-          gh release upload xxh-latest xxh-neovim-linux-x86_64.tar.gz --clobber
+          gh release upload xxh-latest dist/*.tar.gz --clobber
