@@ -17,6 +17,12 @@ vim.opt.rtp:prepend(lazypath)
 
 
 require("lazy").setup({
+  rocks = {
+    -- The XXH payload is intentionally self-contained and cannot rely on
+    -- development headers being installed on the remote host. image.nvim uses
+    -- the magick_cli processor there, so LuaRocks is not needed.
+    enabled = vim.env.NVIM_CONFIG_HS == nil,
+  },
   ui = {
     border = "rounded",
   },
