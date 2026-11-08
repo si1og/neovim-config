@@ -57,3 +57,28 @@ sh scripts/install-input-source-watch.sh
 
 The status line then displays `EN` or `RU` and updates only when macOS reports
 an actual input-source change.
+
+## Remote Neovim with xxh
+
+The companion
+[`xxh-config`](https://github.com/si1og/xxh-config) repository contains an xxh
+prerun plugin that brings a portable Linux Neovim, this configuration and a
+precompiled Haskell provider to an SSH host. Neither Neovim, Stack nor GHC need
+to be installed on the server.
+
+Install the tracked xxh configuration once:
+
+```sh
+git clone https://github.com/si1og/xxh-config.git ~/.config/xxh
+sh ~/.config/xxh/install.sh
+```
+
+After the rolling `xxh-latest` release has been built, connect normally:
+
+```sh
+xxh my-server
+```
+
+Inside the xxh shell, both `nvim` and `vim` start the portable Neovim. The
+payload currently targets Linux x86_64 hosts. It lives entirely inside the
+xxh home on the server and does not replace the system Vim.

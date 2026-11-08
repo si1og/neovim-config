@@ -1,0 +1,86 @@
+name: Build xxh Neovim
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/xxh-neovim.yml"
+      - "haskell/**"
+      - "lua/**"
+      - "init.lua"
+      - "lazy-lock.json"
+      - "scripts/xxh/**"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: xxh-neovim-release
+  cancel-in-progress: true
+
+jobs:
+  linux-x86_64:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 1
+
+      - name: Build and test Haskell provider on glibc 2.31
+        run: |
+          mkdir -p dist/provider
+          docker run --rm \
+            --volume "$PWD:/workspace" \
+            --workdir /workspace/haskell \
+            ubuntu:20.04 \
+            bash -euxc '
+              export DEBIAN_FRONTEND=noninteractive
+              apt-get update
+              apt-get install -y ca-certificates curl gcc g++ git libgmp-dev libtinfo-dev make xz-utils
+              curl -sSL https://get.haskellstack.org/ | sh
+              stack --no-terminal test
+              stack --no-terminal build nvim-config-hs:exe:nvim-config-hs \
+                --copy-bins --local-bin-path /workspace/dist/provider
+            '
+          sudo chown -R "$USER:$USER" dist haskell/.stack-work
+          file dist/provider/nvim-config-hs
+          ldd dist/provider/nvim-config-hs
+
+      - name: Assemble portable payload
+        run: |
+          payload="$RUNNER_TEMP/xxh-neovim"
+          mkdir -p "$payload/bin" "$payload/config" "$payload/lib" "$payload/opt"
+
+          curl --fail --location --silent --show-error \
+            https://github.com/neovim/neovim/releases/download/stable/nvim-linux-x86_64.tar.gz \
+            | tar -xz -C "$payload/opt"
+          mv "$payload/opt/nvim-linux-x86_64" "$payload/opt/nvim"
+
+          cp dist/provider/nvim-config-hs "$payload/bin/nvim-config-hs"
+          ldd dist/provider/nvim-config-hs \
+            | awk '/=> \/.*\/(libgmp|libtinfo|libnuma|libffi)/ { print $3 }' \
+            | while read -r library; do cp --dereference "$library" "$payload/lib/"; done
+          cp scripts/xxh/nvim-wrapper.sh "$payload/bin/nvim"
+          chmod +x "$payload/bin/nvim" "$payload/bin/nvim-config-hs"
+
+          mkdir -p "$payload/config/nvim"
+          git archive HEAD | tar -x -C "$payload/config/nvim"
+          git -C "$payload/config/nvim" init
+          git -C "$payload/config/nvim" config user.name "xxh build"
+          git -C "$payload/config/nvim" config user.email "xxh-build@localhost"
+          git -C "$payload/config/nvim" add .
+          git -C "$payload/config/nvim" commit -m "xxh payload"
+
+          tar -czf xxh-neovim-linux-x86_64.tar.gz -C "$payload" .
+
+      - name: Publish rolling release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if ! gh release view xxh-latest >/dev/null 2>&1; then
+            gh release create xxh-latest \
+              --title "xxh Neovim" \
+              --notes "Rolling Linux x86_64 build for the xxh prerun plugin."
+          fi
+          gh release upload xxh-latest xxh-neovim-linux-x86_64.tar.gz --clobber
