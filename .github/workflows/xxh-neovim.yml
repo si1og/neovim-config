@@ -27,25 +27,31 @@ jobs:
         with:
           fetch-depth: 1
 
-      - name: Build and test Haskell provider on glibc 2.31
+      - name: Set up Haskell
+        uses: haskell-actions/setup@v2
+        with:
+          ghc-version: "9.10.3"
+          enable-stack: true
+          stack-version: latest
+          stack-no-global: true
+
+      - name: Cache Stack
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.stack
+            haskell/.stack-work
+          key: ${{ runner.os }}-stack-${{ hashFiles('haskell/stack.yaml', 'haskell/nvim-config-hs.cabal') }}
+
+      - name: Build and test Haskell provider
+        working-directory: haskell
         run: |
-          mkdir -p dist/provider
-          docker run --rm \
-            --volume "$PWD:/workspace" \
-            --workdir /workspace/haskell \
-            ubuntu:20.04 \
-            bash -euxc '
-              export DEBIAN_FRONTEND=noninteractive
-              apt-get update
-              apt-get install -y ca-certificates curl gcc g++ git libgmp-dev libtinfo-dev make xz-utils
-              curl -sSL https://get.haskellstack.org/ | sh
-              stack --no-terminal test
-              stack --no-terminal build nvim-config-hs:exe:nvim-config-hs \
-                --copy-bins --local-bin-path /workspace/dist/provider
-            '
-          sudo chown -R "$USER:$USER" dist haskell/.stack-work
-          file dist/provider/nvim-config-hs
-          ldd dist/provider/nvim-config-hs
+          mkdir -p ../dist/provider
+          stack --no-terminal test
+          stack --no-terminal build nvim-config-hs:exe:nvim-config-hs \
+            --copy-bins --local-bin-path ../dist/provider
+          file ../dist/provider/nvim-config-hs
+          ldd ../dist/provider/nvim-config-hs
 
       - name: Assemble portable payload
         run: |
