@@ -87,6 +87,7 @@ function M.open()
   local finders = require("telescope.finders")
   local conf = require("telescope.config").values
   local themes = require("telescope.themes")
+  local modal_layout = require("config.telescope_layout")
   local actions = require("telescope.actions")
   local action_state = require("telescope.actions.state")
 
@@ -180,10 +181,7 @@ function M.open()
   local picker_opts = themes.get_dropdown({
     initial_mode = "normal",
     previewer = false,
-    layout_config = {
-      width = 0.55,
-      height = 0.45,
-    },
+    layout_config = modal_layout.config(),
   })
 
   picker = pickers.new(picker_opts, {

@@ -9,19 +9,18 @@ return {
       local telescope = require("telescope")
       local builtin = require("telescope.builtin")
       local themes = require("telescope.themes")
+      local modal_layout = require("config.telescope_layout")
 
       local function project_search_opts(opts)
         return themes.get_dropdown(vim.tbl_deep_extend("force", {
           initial_mode = "insert",
           previewer = true,
           layout_strategy = "vertical",
-          layout_config = {
-            width = 0.55,
-            height = 0.45,
+          layout_config = modal_layout.config({
             prompt_position = "top",
             mirror = true,
             preview_height = 0.5,
-          },
+          }),
         }, opts or {}))
       end
 
@@ -45,7 +44,9 @@ return {
         },
         extensions = {
           ["ui-select"] = {
-            require("telescope.themes").get_dropdown({}),
+            require("telescope.themes").get_dropdown({
+              layout_config = modal_layout.config(),
+            }),
           },
         },
       })
@@ -71,10 +72,7 @@ return {
         builtin.buffers(require("telescope.themes").get_dropdown({
           initial_mode = "normal",
           previewer = false,
-          layout_config = {
-            width = 0.55,
-            height = 0.45,
-          },
+          layout_config = modal_layout.config(),
         }))
       end, { desc = "Search open buffers" })
       vim.keymap.set("n", "<leader>fh", builtin.help_tags, { desc = "Telescope help tags" })

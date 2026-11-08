@@ -1,5 +1,5 @@
 local M = {
-  label = "--",
+  label = "",
   source = nil,
   job = nil,
 }
@@ -43,7 +43,7 @@ function M.setup()
     end,
     on_exit = function()
       M.job = nil
-      M.label = "--"
+      M.label = ""
       M.source = nil
       refresh_statusline()
     end,
@@ -64,7 +64,7 @@ function M.status()
   if not M.label and M.source then
     M.label = label_for(M.source)
   end
-  return M.label or "--"
+  return M.label or ""
 end
 
 return M
