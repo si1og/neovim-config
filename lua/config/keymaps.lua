@@ -79,6 +79,12 @@ vim.keymap.set("n", "++", "<cmd>write<CR>", { desc = "Save file", silent = true 
 -- Delete without overwriting the current register
 vim.keymap.set({ "n", "v" }, "<leader>x", '"_d', { desc = "Delete without yanking" })
 
+-- System clipboard
+vim.keymap.set("v", "<leader>y", '"+y', { desc = "Copy selection to system clipboard" })
+vim.keymap.set("n", "<leader>Y", '"+yy', { desc = "Copy line to system clipboard" })
+vim.keymap.set({ "n", "v" }, "<leader>v", '"+p', { desc = "Paste from system clipboard" })
+vim.keymap.set("n", "<leader>V", '"+P', { desc = "Paste before from system clipboard" })
+
 -- Close current buffer
 vim.keymap.set("n", "<leader>c", "<cmd>confirm bdelete<CR>", {
   desc = "Close current buffer",
