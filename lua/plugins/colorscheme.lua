@@ -35,23 +35,23 @@ return {
           waveRed = "#ff795f",
           peachRed = "#ff8860",
           surimiOrange = "#ff8860",
-          roninYellow = "#ff9f78",
-          boatYellow1 = "#ffad88",
-          boatYellow2 = "#ffb89d",
-          carpYellow = "#ffc09f",
+          roninYellow = "#e6c384",
+          boatYellow1 = "#d8b46a",
+          boatYellow2 = "#c9b27c",
+          carpYellow = "#e6c384",
           oldWhite = "#ffd0bd",
           fujiWhite = "#fffbf5",
-          crystalBlue = "#ffc4aa",
-          springBlue = "#ffb89d",
-          lightBlue = "#ffd0bd",
-          dragonBlue = "#ffab80",
-          waveAqua1 = "#ffad88",
-          waveAqua2 = "#ffb89d",
-          springGreen = "#ffad88",
-          sakuraPink = "#ff9f78",
-          oniViolet = "#ff9470",
-          springViolet1 = "#ff9f78",
-          springViolet2 = "#ffb89d",
+          crystalBlue = "#9abbd3",
+          springBlue = "#7fb4ca",
+          lightBlue = "#a3d4d5",
+          dragonBlue = "#658594",
+          waveAqua1 = "#6f9b8d",
+          waveAqua2 = "#8ea4a2",
+          springGreen = "#98bb6c",
+          sakuraPink = "#dca6b2",
+          oniViolet = "#b8a3d3",
+          springViolet1 = "#938aa9",
+          springViolet2 = "#9cabca",
         },
       },
     })
@@ -71,14 +71,14 @@ return {
       faint = "#5a4d42",
       red = "#ff705c",
       orange = "#ff8860",
-      peach = "#ff9f78",
-      yellow = "#ffc09f",
-      green = "#ffad88",
-      aqua = "#ffb89d",
-      blue = "#ffc4aa",
-      cyan = "#ffab80",
-      purple = "#ff9470",
-      pink = "#ffd0bd",
+      peach = "#f2ad85",
+      yellow = "#e6c384",
+      green = "#98bb6c",
+      aqua = "#8ea4a2",
+      blue = "#9abbd3",
+      cyan = "#7fb4ca",
+      purple = "#b8a3d3",
+      pink = "#dca6b2",
     }
 
     local function hl(group, opts)
@@ -167,8 +167,8 @@ return {
     hl("@function.method", { fg = c.yellow })
     hl("@function.method.call", { fg = c.yellow })
     hl("@constructor", { fg = c.green })
-    hl("@type", { fg = c.yellow })
-    hl("@type.builtin", { fg = c.yellow, italic = true })
+    hl("@type", { fg = c.green })
+    hl("@type.builtin", { fg = c.green, italic = true })
     hl("@module", { fg = c.soft })
     hl("@namespace", { fg = c.soft })
     hl("@tag", { fg = c.orange })
