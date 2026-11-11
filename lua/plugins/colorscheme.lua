@@ -176,6 +176,39 @@ return {
     hl("@tag.attribute", { fg = c.yellow })
     hl("@tag.delimiter", { fg = c.soft })
 
+    -- Markdown follows Zed's Rust & Brown markup palette.
+    hl("@markup.heading", { fg = c.orange, bold = true })
+    for level = 1, 6 do
+      hl("@markup.heading." .. level .. ".markdown", { fg = c.orange, bold = true })
+    end
+    hl("@markup.list", { fg = c.orange })
+    hl("@markup.list.checked", { fg = c.green })
+    hl("@markup.list.unchecked", { fg = c.orange })
+    hl("@markup.link", { fg = c.blue, underline = true })
+    hl("@markup.link.label", { fg = c.blue, underline = true })
+    hl("@markup.link.url", { fg = c.blue, underline = true })
+    hl("@markup.raw", { fg = c.aqua })
+    hl("@markup.raw.block", { fg = c.aqua })
+    hl("@markup.italic", { fg = c.string, italic = true })
+    hl("@markup.strong", { fg = c.yellow, bold = true })
+    hl("@markup.quote", { fg = c.muted, italic = true })
+
+    -- Legacy Markdown groups used when Tree-sitter is unavailable.
+    hl("markdownH1", { fg = c.orange, bold = true })
+    hl("markdownH2", { fg = c.orange, bold = true })
+    hl("markdownH3", { fg = c.orange, bold = true })
+    hl("markdownH4", { fg = c.orange, bold = true })
+    hl("markdownH5", { fg = c.orange, bold = true })
+    hl("markdownH6", { fg = c.orange, bold = true })
+    hl("markdownListMarker", { fg = c.orange })
+    hl("markdownOrderedListMarker", { fg = c.orange })
+    hl("markdownLinkText", { fg = c.blue, underline = true })
+    hl("markdownUrl", { fg = c.blue, underline = true })
+    hl("markdownCode", { fg = c.aqua })
+    hl("markdownCodeBlock", { fg = c.aqua })
+    hl("markdownBold", { fg = c.yellow, bold = true })
+    hl("markdownItalic", { fg = c.string, italic = true })
+
     local semantic = {
       c = true,
       cpp = true,
