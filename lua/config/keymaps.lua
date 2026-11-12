@@ -117,6 +117,10 @@ vim.keymap.set("n", "<leader>]", "<cmd>bnext<CR>" .. buffer_nav, {
 vim.keymap.set("n", "<S-Space>[", "zc", { desc = "Close fold" })
 vim.keymap.set("n", "<S-Space>]", "zo", { desc = "Open fold" })
 
+-- Scroll the window while keeping the cursor on the same buffer line.
+vim.keymap.set("n", "<M-j>", "<C-e>", { desc = "Scroll down without moving cursor" })
+vim.keymap.set("n", "<M-k>", "<C-y>", { desc = "Scroll up without moving cursor" })
+
 -- Splits navigation
 vim.keymap.set("n", "<C-h>", "<C-w>h")
 vim.keymap.set("n", "<C-j>", "<C-w>j")
