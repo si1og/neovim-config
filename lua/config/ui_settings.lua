@@ -26,6 +26,18 @@ local transparent_groups = {
   TroubleNormalNC = "#28211c",
 }
 
+local fill_groups = { "BufferLineFill", "TabLineFill" }
+local original_fill_backgrounds = {}
+
+local function capture_fill_backgrounds()
+  for _, group in ipairs(fill_groups) do
+    local background = vim.api.nvim_get_hl(0, { name = group, link = false }).bg
+    if background ~= nil then
+      original_fill_backgrounds[group] = background
+    end
+  end
+end
+
 local function read_settings()
   local ok, lines = pcall(vim.fn.readfile, state_path)
   if not ok or #lines == 0 then
@@ -55,10 +67,19 @@ function M.apply()
   for group, background in pairs(transparent_groups) do
     update_background(group, transparent and "NONE" or background)
   end
+
+  for _, group in ipairs(fill_groups) do
+    if transparent then
+      update_background(group, "NONE")
+    elseif original_fill_backgrounds[group] ~= nil then
+      update_background(group, original_fill_backgrounds[group])
+    end
+  end
 end
 
 function M.setup()
   read_settings()
+  capture_fill_backgrounds()
   M.apply()
   vim.keymap.set("n", "<Space>s", M.open, { desc = "Open UI settings" })
 
@@ -66,6 +87,7 @@ function M.setup()
   vim.api.nvim_create_autocmd("ColorScheme", {
     group = group,
     callback = function()
+      capture_fill_backgrounds()
       M.apply()
     end,
   })
@@ -73,14 +95,20 @@ function M.setup()
     group = group,
     pattern = "LazyDone",
     callback = function()
-      vim.schedule(M.apply)
+      vim.schedule(function()
+        capture_fill_backgrounds()
+        M.apply()
+      end)
     end,
   })
   vim.api.nvim_create_autocmd("User", {
     group = group,
     pattern = "VeryLazy",
     callback = function()
-      vim.schedule(M.apply)
+      vim.schedule(function()
+        capture_fill_backgrounds()
+        M.apply()
+      end)
     end,
   })
   vim.api.nvim_create_autocmd("FileType", {
