@@ -110,17 +110,8 @@ return {
     -- Other auxiliary panels stay slightly raised.
     hl("TelescopeNormal", { fg = c.fg, bg = c.surface })
     hl("TelescopeBorder", { fg = c.border, bg = c.surface })
-    hl("TelescopeTitle", { fg = c.orange, bg = c.surface, bold = true })
-    hl("TelescopePromptTitle", { fg = c.orange, bg = c.surface, bold = true })
-    hl("TelescopeResultsTitle", { fg = c.peach, bg = c.surface, bold = true })
-    hl("TelescopePreviewTitle", { fg = c.peach, bg = c.surface, bold = true })
     hl("TelescopePromptNormal", { fg = c.fg, bg = c.panel })
     hl("TelescopePromptBorder", { fg = c.border, bg = c.panel })
-    hl("TelescopePromptPrefix", { fg = c.orange, bg = c.panel })
-    hl("TelescopeSelection", { fg = c.fg, bg = c.select })
-    hl("TelescopeSelectionCaret", { fg = c.orange, bg = c.select, bold = true })
-    hl("TelescopeMatching", { fg = c.orange, bold = true })
-    hl("TelescopeMultiSelection", { fg = c.peach, bg = c.surface })
     hl("TroubleNormal", { fg = c.fg, bg = c.surface })
     hl("TroubleNormalNC", { fg = c.soft, bg = c.surface })
 
@@ -294,8 +285,6 @@ return {
       hl("@lsp.typemod.variable.readonly." .. lang, { fg = c.blue })
       hl("@lsp.typemod.property.readonly." .. lang, { fg = c.cyan })
     end
-
-    require("config.ui_settings").setup()
 
   end,
 }

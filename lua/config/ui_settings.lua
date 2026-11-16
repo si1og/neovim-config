@@ -26,21 +26,6 @@ local transparent_groups = {
   TroubleNormalNC = "#28211c",
 }
 
-local menu_backgrounds = {
-  NormalFloat = "#28211c",
-  FloatBorder = "#28211c",
-  TelescopeNormal = "#28211c",
-  TelescopeBorder = "#28211c",
-  TelescopePromptNormal = "#302822",
-  TelescopePromptBorder = "#302822",
-  Pmenu = "#28211c",
-  PmenuSbar = "#28211c",
-  CmpPmenu = "#28211c",
-  CmpBorder = "#28211c",
-}
-
-local original_bar_highlights = {}
-
 local function read_settings()
   local ok, lines = pcall(vim.fn.readfile, state_path)
   if not ok or #lines == 0 then
@@ -58,11 +43,9 @@ local function write_settings()
   vim.fn.writefile({ vim.json.encode(currentSettings) }, state_path)
 end
 
-local function update_group(group, values)
+local function update_background(group, background)
   local attributes = vim.api.nvim_get_hl(0, { name = group, link = false })
-  for key, value in pairs(values) do
-    attributes[key] = value
-  end
+  attributes.bg = background
   vim.api.nvim_set_hl(0, group, attributes)
 end
 
@@ -70,54 +53,53 @@ function M.apply()
   local transparent = currentSettings[flag.key]
 
   for group, background in pairs(transparent_groups) do
-    update_group(group, { bg = transparent and "NONE" or background })
+    update_background(group, transparent and "NONE" or background)
   end
-
-  for group, background in pairs(menu_backgrounds) do
-    update_group(group, { bg = background })
-  end
-
-  -- These surfaces cannot use window blending, so remove their backgrounds.
-  -- Keep the active state visible through a softer orange foreground.
-  for name, attributes in pairs(vim.api.nvim_get_hl(0, {})) do
-    if name:match("^lualine_") or name:match("^BufferLine") then
-      if original_bar_highlights[name] == nil then
-        original_bar_highlights[name] = vim.deepcopy(attributes)
-      end
-      local values = vim.deepcopy(original_bar_highlights[name])
-      if transparent then
-        values.bg = "NONE"
-        if name:match("lualine_a_") or name:match("BufferSelected") or name:match("IndicatorSelected") then
-          values.fg = "#d47857"
-        elseif name:match("lualine_transitional_") or name:match("BufferLineSeparator") then
-          values.fg = "#5a4d42"
-        end
-      end
-      vim.api.nvim_set_hl(0, name, values)
-    end
-  end
-
-  -- Telescope, completion menus and floating windows stay subtly tinted.
-  vim.o.winblend = transparent and 20 or 0
-  vim.o.pumblend = transparent and 20 or 0
 end
 
 function M.setup()
   read_settings()
   M.apply()
+  vim.keymap.set("n", "<Space>s", M.open, { desc = "Open UI settings" })
 
   local group = vim.api.nvim_create_augroup("ui-settings-highlights", { clear = true })
   vim.api.nvim_create_autocmd("ColorScheme", {
     group = group,
     callback = function()
-      original_bar_highlights = {}
       M.apply()
     end,
   })
   vim.api.nvim_create_autocmd("User", {
     group = group,
     pattern = "LazyDone",
-    callback = M.apply,
+    callback = function()
+      vim.schedule(M.apply)
+    end,
+  })
+  vim.api.nvim_create_autocmd("User", {
+    group = group,
+    pattern = "VeryLazy",
+    callback = function()
+      vim.schedule(M.apply)
+    end,
+  })
+  vim.api.nvim_create_autocmd("FileType", {
+    group = group,
+    pattern = "neo-tree",
+    callback = function(event)
+      vim.schedule(function()
+        if vim.api.nvim_buf_is_valid(event.buf) then
+          for _, win in ipairs(vim.fn.win_findbuf(event.buf)) do
+            vim.wo[win].winhighlight = table.concat({
+              "Normal:NeoTreeNormal",
+              "NormalNC:NeoTreeNormalNC",
+              "EndOfBuffer:NeoTreeEndOfBuffer",
+              "SignColumn:NeoTreeSignColumn",
+            }, ",")
+          end
+        end
+      end)
+    end,
   })
 end
 
