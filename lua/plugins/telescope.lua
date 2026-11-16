@@ -2,8 +2,9 @@ return {
   {
     "nvim-telescope/telescope.nvim",
     tag = "v0.2.0",
+    event = "VeryLazy",
     cmd = "Telescope",
-    keys = { "<leader>ff", "<leader>fg", "<leader>/", "<leader>fb", "<leader>fh", "<leader>p", "<leader>ft" },
+    keys = { "<leader>ff", "<leader>fg", "<leader>/", "<leader>fb", "<leader>fh", "<leader>p", "<leader>ft", "<leader>s" },
     dependencies = { "nvim-lua/plenary.nvim", "nvim-telescope/telescope-ui-select.nvim" },
     config = function()
       local telescope = require("telescope")
@@ -80,6 +81,9 @@ return {
       vim.keymap.set("n", "<leader>ft", function()
         vim.cmd("TodoTelescope")
       end, { desc = "Open todo telescope" })
+      vim.keymap.set("n", "<leader>s", function()
+        require("config.ui_settings").open()
+      end, { desc = "Open UI settings" })
     end,
   },
   {
