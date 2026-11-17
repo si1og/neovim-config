@@ -94,6 +94,7 @@ return {
     hl("CursorLine", { bg = c.panel })
     hl("CursorLineNr", { fg = c.soft, bold = true })
     hl("LineNr", { fg = c.muted })
+    hl("GitSignsCurrentLineBlame", { fg = c.muted, italic = true })
     hl("Visual", { bg = c.select })
     hl("Search", { fg = c.bg, bg = c.orange })
     hl("IncSearch", { fg = c.bg, bg = c.yellow })
