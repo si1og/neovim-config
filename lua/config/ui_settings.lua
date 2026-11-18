@@ -18,6 +18,7 @@ local transparent_groups = {
   EndOfBuffer = "#1a1612",
   SignColumn = "#1a1612",
   WinSeparator = "#1a1612",
+  BufferLineBottomBorder = "#1a1612",
   NeoTreeNormal = "#1a1612",
   NeoTreeNormalNC = "#1a1612",
   NeoTreeEndOfBuffer = "#1a1612",

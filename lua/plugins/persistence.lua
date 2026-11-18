@@ -16,8 +16,16 @@ return {
         "winsize",
       }
 
+      local group = vim.api.nvim_create_augroup("restore-project-session", { clear = true })
+      vim.api.nvim_create_autocmd("User", {
+        group = group,
+        pattern = "PersistenceLoadPost",
+        callback = function()
+          require("config.session_persistence").restore_decorations()
+        end,
+      })
       vim.api.nvim_create_autocmd("VimEnter", {
-        group = vim.api.nvim_create_augroup("restore-project-session", { clear = true }),
+        group = group,
         once = true,
         callback = function()
           if vim.fn.argc() == 0 then

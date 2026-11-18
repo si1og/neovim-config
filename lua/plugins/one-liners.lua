@@ -15,9 +15,9 @@ return {
     "mbbill/undotree",
     lazy = true,
   },
-  { -- Show CSS Colors
+  { -- Preview color literals
     "brenoprata10/nvim-highlight-colors",
-    ft = { "css", "scss", "sass", "html", "javascript", "typescript", "javascriptreact", "typescriptreact" },
+    ft = { "css", "scss", "sass", "html", "javascript", "typescript", "javascriptreact", "typescriptreact", "lua", "markdown", "latex" },
     config = function()
       require("nvim-highlight-colors").setup({})
     end,

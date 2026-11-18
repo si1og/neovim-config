@@ -18,6 +18,24 @@ function M.has_file_buffers()
   return vim.iter(vim.api.nvim_list_bufs()):any(is_file_buffer)
 end
 
+function M.restore_decorations()
+  vim.schedule(function()
+    if not M.has_file_buffers() then
+      return
+    end
+
+    require("lazy").load({ plugins = { "gitsigns.nvim", "indent-blankline.nvim" } })
+
+    local gitsigns = require("gitsigns")
+    for _, bufnr in ipairs(vim.api.nvim_list_bufs()) do
+      if is_file_buffer(bufnr) and vim.api.nvim_buf_is_loaded(bufnr) then
+        gitsigns.attach({ bufnr = bufnr })
+      end
+    end
+    require("ibl").refresh_all()
+  end)
+end
+
 function M.save()
   if not M.has_file_buffers() then
     return false

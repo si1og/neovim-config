@@ -5,9 +5,10 @@ return {
   config = function()
     local bufferline = require("bufferline")
     local bg = "#1a1612"
-    local inactive = "#231e1a"
+    local inactive = "#211c18"
     local active = "#2b2521"
     local border = "#3d352e"
+    local bottom_border = inactive
     local text = "#d4c5b9"
     local muted = "#8a7d72"
     local accent = "#ff8860"
@@ -51,5 +52,19 @@ return {
         offset_separator = { fg = border, bg = bg },
       },
     })
+
+    local function highlight_border()
+      vim.api.nvim_set_hl(0, "BufferLineBottomBorder", {
+        fg = bottom_border,
+        bg = bg,
+      })
+    end
+
+    highlight_border()
+    vim.api.nvim_create_autocmd("ColorScheme", {
+      group = vim.api.nvim_create_augroup("bufferline-bottom-border", { clear = true }),
+      callback = highlight_border,
+    })
+    vim.o.winbar = "%#BufferLineBottomBorder#%{repeat('▔', winwidth(0))}"
   end,
 }
