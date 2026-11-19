@@ -83,7 +83,7 @@ jobs:
           cp scripts/xxh/git-wrapper.sh "$payload/bin/git"
           cp "$(command -v git)" "$payload/opt/git/bin/git"
           cp --dereference "$(git --exec-path)/git-remote-https" "$payload/opt/git/libexec/git-core/git-remote-https"
-          cp "$(git --exec-path)/git-submodule" "$(git --exec-path)/git-sh-setup" "$payload/opt/git/libexec/git-core/"
+          cp "$(git --exec-path)/git-submodule" "$(git --exec-path)/git-sh-setup" "$(git --exec-path)/git-sh-i18n" "$payload/opt/git/libexec/git-core/"
           cp -a /usr/share/git-core/templates/. "$payload/opt/git/share/git-core/templates/"
           ldd "$(command -v git)" "$(git --exec-path)/git-remote-https" \
             | awk '$2 == "=>" && $3 ~ /^\// { print $3 }' \
