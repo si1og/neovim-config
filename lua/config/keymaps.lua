@@ -57,10 +57,10 @@ vim.keymap.set("v", "J", ":m '>+1<CR>gv=gv", { desc = "Move Lines Down" })
 vim.keymap.set("v", "K", ":m '<-2<CR>gv=gv", { desc = "Move Lines Up" })
 
 -- Keep search results centered
-vim.keymap.set("n", "n", "nzzv", { desc = "Next Match (centered)" })
-vim.keymap.set("n", "N", "Nzzv", { desc = "Prev Match (centered)" })
-vim.keymap.set("n", "*", "*zzv", { desc = "Search Word (centered)" })
-vim.keymap.set("n", "#", "#zzv", { desc = "Search Word Back (centered)" })
+vim.keymap.set("n", "n", "nzzzv", { desc = "Next Match (centered)" })
+vim.keymap.set("n", "N", "Nzzzv", { desc = "Prev Match (centered)" })
+vim.keymap.set("n", "*", "*zzzv", { desc = "Search Word (centered)" })
+vim.keymap.set("n", "#", "#zzzv", { desc = "Search Word Back (centered)" })
 vim.keymap.set("n", "g*", "g*zz", { desc = "Search Partial (centered)" })
 vim.keymap.set("n", "g#", "g#zz", { desc = "Search Partial Back (centered)" })
 
