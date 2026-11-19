@@ -67,7 +67,7 @@ jobs:
       - name: Assemble portable payload
         run: |
           payload="$RUNNER_TEMP/xxh-neovim"
-          mkdir -p "$payload/bin" "$payload/config" "$payload/lib" "$payload/opt/git/bin" "$payload/opt/git/libexec/git-core" "$payload/opt/git/lib"
+          mkdir -p "$payload/bin" "$payload/config" "$payload/lib" "$payload/opt/git/bin" "$payload/opt/git/libexec/git-core" "$payload/opt/git/lib" "$payload/opt/git/share/git-core/templates"
 
           nvim_archive="nvim-linux-${{ matrix.nvim_arch }}.tar.gz"
           curl --fail --location --silent --show-error \
@@ -83,6 +83,8 @@ jobs:
           cp scripts/xxh/git-wrapper.sh "$payload/bin/git"
           cp "$(command -v git)" "$payload/opt/git/bin/git"
           cp --dereference "$(git --exec-path)/git-remote-https" "$payload/opt/git/libexec/git-core/git-remote-https"
+          cp "$(git --exec-path)/git-submodule" "$(git --exec-path)/git-sh-setup" "$payload/opt/git/libexec/git-core/"
+          cp -a /usr/share/git-core/templates/. "$payload/opt/git/share/git-core/templates/"
           ldd "$(command -v git)" "$(git --exec-path)/git-remote-https" \
             | awk '$2 == "=>" && $3 ~ /^\// { print $3 }' \
             | grep -Ev '/(libc|libm|libpthread|libdl|librt|libresolv|libnss_[^/]*)\.so' \
@@ -100,6 +102,7 @@ jobs:
           git -C "$payload/config/nvim" config user.email "xxh-build@localhost"
           git -C "$payload/config/nvim" add .
           git -C "$payload/config/nvim" commit -m "xxh payload"
+          PATH="$payload/bin:$PATH" git -C "$payload/config/nvim" submodule status
 
           tar -czf "xxh-neovim-linux-${{ matrix.arch }}.tar.gz" -C "$payload" .
 
