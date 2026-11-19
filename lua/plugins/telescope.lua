@@ -3,8 +3,12 @@ return {
     "nvim-telescope/telescope.nvim",
     tag = "v0.2.0",
     cmd = "Telescope",
-    keys = { "<leader>ff", "<leader>fg", "<leader>/", "<leader>fb", "<leader>fh", "<leader>p", "<leader>ft" },
-    dependencies = { "nvim-lua/plenary.nvim", "nvim-telescope/telescope-ui-select.nvim" },
+    keys = { "<leader>ff", "<leader>fg", "<leader>/", "<leader>fb", "<leader>fe", "<leader>fh", "<leader>p", "<leader>ft" },
+    dependencies = {
+      "nvim-lua/plenary.nvim",
+      "nvim-telescope/telescope-ui-select.nvim",
+      "nvim-telescope/telescope-file-browser.nvim",
+    },
     config = function()
       local telescope = require("telescope")
       local builtin = require("telescope.builtin")
@@ -48,9 +52,21 @@ return {
               layout_config = modal_layout.config(),
             }),
           },
+          file_browser = {
+            theme = "dropdown",
+            initial_mode = "normal",
+            previewer = true,
+            layout_strategy = "vertical",
+            layout_config = modal_layout.config({
+              prompt_position = "top",
+              mirror = true,
+              preview_height = 0.5,
+            }),
+          },
         },
       })
       telescope.load_extension("ui-select")
+      telescope.load_extension("file_browser")
 
       vim.keymap.set("n", "<leader>ff", function()
         if vim.fn.exists("*NvimConfigBinaryFilePatterns") ~= 1 then
@@ -75,6 +91,9 @@ return {
           layout_config = modal_layout.config(),
         }))
       end, { desc = "Search open buffers" })
+      vim.keymap.set("n", "<leader>fe", function()
+        telescope.extensions.file_browser.file_browser()
+      end, { desc = "Browse files" })
       vim.keymap.set("n", "<leader>fh", builtin.help_tags, { desc = "Telescope help tags" })
       vim.keymap.set("n", "<leader>p", builtin.commands, { desc = "Command palette" })
       vim.keymap.set("n", "<leader>ft", function()
