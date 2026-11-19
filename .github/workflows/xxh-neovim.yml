@@ -67,7 +67,7 @@ jobs:
       - name: Assemble portable payload
         run: |
           payload="$RUNNER_TEMP/xxh-neovim"
-          mkdir -p "$payload/bin" "$payload/config" "$payload/lib" "$payload/opt"
+          mkdir -p "$payload/bin" "$payload/config" "$payload/lib" "$payload/opt/git/bin" "$payload/opt/git/libexec/git-core" "$payload/opt/git/lib"
 
           nvim_archive="nvim-linux-${{ matrix.nvim_arch }}.tar.gz"
           curl --fail --location --silent --show-error \
@@ -80,7 +80,18 @@ jobs:
             | awk '/=> \/.*\/(libgmp|libtinfo|libnuma|libffi)/ { print $3 }' \
             | while read -r library; do cp --dereference "$library" "$payload/lib/"; done
           cp scripts/xxh/nvim-wrapper.sh "$payload/bin/nvim"
-          chmod +x "$payload/bin/nvim" "$payload/bin/nvim-config-hs"
+          cp scripts/xxh/git-wrapper.sh "$payload/bin/git"
+          cp "$(command -v git)" "$payload/opt/git/bin/git"
+          cp --dereference "$(git --exec-path)/git-remote-https" "$payload/opt/git/libexec/git-core/git-remote-https"
+          ldd "$(command -v git)" "$(git --exec-path)/git-remote-https" \
+            | awk '$2 == "=>" && $3 ~ /^\// { print $3 }' \
+            | grep -Ev '/(libc|libm|libpthread|libdl|librt|libresolv|libnss_[^/]*)\.so' \
+            | sort -u \
+            | while read -r library; do cp --dereference "$library" "$payload/opt/git/lib/"; done
+          chmod +x "$payload/bin/nvim" "$payload/bin/git" "$payload/bin/nvim-config-hs"
+
+          PATH="$payload/bin:$PATH" git --version
+          PATH="$payload/bin:$PATH" git ls-remote https://github.com/folke/lazy.nvim.git HEAD
 
           mkdir -p "$payload/config/nvim"
           git archive HEAD | tar -x -C "$payload/config/nvim"
